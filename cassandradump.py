@@ -20,14 +20,17 @@ CONCURRENT_BATCH_SIZE = 1000
 
 args = None
 
+
 def cql_type(val):
     try:
         return val.data_type.typename
     except AttributeError:
         return val.cql_type
 
+
 def to_utf8(string):
     return codecs.decode(string, 'utf-8')
+
 
 def log_quiet(msg):
     if not args.quiet:
@@ -293,8 +296,10 @@ def export_data(session):
 
     f.close()
 
+
 def get_credentials():
     return {'username': args.username, 'password': args.password}
+
 
 def setup_cluster():
     if args.host is None:
@@ -311,6 +316,7 @@ def setup_cluster():
         connect_timeout = 5
     else:
         connect_timeout = int(args.connect_timeout)
+    # connect_timeout = None
 
     if args.ssl is not None and args.certfile is not None:
       ssl_opts = { 'ca_certs': args.certfile,
@@ -337,7 +343,8 @@ def setup_cluster():
 
     session = cluster.connect()
 
-    session.default_timeout = TIMEOUT
+    # session.default_timeout = TIMEOUT
+    session.default_timeout = connect_timeout
     session.default_fetch_size = FETCH_SIZE
     session.row_factory = cassandra.query.ordered_dict_factory
     return session
@@ -404,3 +411,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

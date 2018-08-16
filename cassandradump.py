@@ -152,7 +152,10 @@ def import_data(session):
                     cassandra.concurrent.execute_concurrent(session, concurrent_statements)
                     concurrent_statements = []
 
-                session.execute(statement)
+                try:
+                    session.execute(statement)
+                except cassandra.AlreadyExists as e:
+                    sys.stdout.write('\n cassandra object already exists. continuing. {}'.format(e.message))
 
             statement = ''
 
@@ -236,7 +239,7 @@ def export_data(session):
 
             if not args.no_create:
                 log_quiet('Exporting schema for keyspace ' + keyname + '\n')
-                f.write('DROP KEYSPACE IF EXISTS "' + keyname + '";\n')
+                # f.write('DROP KEYSPACE IF EXISTS "' + keyname + '";\n')
                 f.write(keyspace.export_as_string() + '\n')
 
             for tablename, tableval in keyspace.tables.iteritems():
